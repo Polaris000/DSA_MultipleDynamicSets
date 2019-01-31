@@ -14,6 +14,32 @@ void display_menu()
 	"9. Press 0 to exit  \n");
 }
 
+// Create a new list
+// 2. Insert a new node in a given list in sorted order: Here list and node object is taken as input
+// 3. Delete an element from a given list: Here list and node object is taken as input
+// 4. Count total elements excluding free list
+// 5. Count total elements of a list: Here list is taken as input
+// 6. Display all lists
+// 7. Display free list
+// 8. Preform defragmentation
+
+// int select_pref_option()
+// {
+// 	printf("Your option: \n");
+// 	int option;
+
+// 	scanf("%d", &option);
+
+// 	switch(option)
+// 	{
+// 		case 0:
+// 			return -1;
+// 		case 1: create_new_list(); break;
+// 		case 2: insert
+// 	}
+
+// }
+
 void main()
 {
 	display_menu();
