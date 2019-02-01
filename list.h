@@ -2,9 +2,6 @@
 #include <stdlib.h>
 #define RAMSIZE 20
 
-extern int RAM[RAMSIZE];
-extern int NUMLISTS;
-
 //structs
 typedef struct Node_
 {
@@ -19,5 +16,11 @@ typedef struct List_
 	int size;
 	int id;
 }List;
+
+
+// global variables
+extern int RAMINT[RAMSIZE];
+extern List RAMLIST[RAMSIZE / 3];
+extern int NUMLISTS;
 
 // methods

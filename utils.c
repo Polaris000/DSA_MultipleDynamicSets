@@ -40,6 +40,26 @@ void display_menu()
 
 // }
 
+
+void set_up_ram_int()
+{
+	for(int i = 1; i <= RAMSIZE; i += 3)
+	{
+		fill_contig_loc(i);
+	}
+}
+
+void fill_contig_loc(int i)
+{
+	RAMINT[i + 0] = RAMLIST[i].key;
+	RAMINT[i + 1] = RAMLIST[i].next;
+	RAMINT[i + 2] = RAMLIST[i].prev;
+}
+
+
+
+
+
 void main()
 {
 	display_menu();
