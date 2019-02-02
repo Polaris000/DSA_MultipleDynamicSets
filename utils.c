@@ -1,4 +1,7 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include "list.h"
+
 
 void display_menu()
 {
@@ -14,6 +17,7 @@ void display_menu()
 	"9. Press 0 to exit  \n");
 }
 
+//
 // Create a new list
 // 2. Insert a new node in a given list in sorted order: Here list and node object is taken as input
 // 3. Delete an element from a given list: Here list and node object is taken as input
@@ -40,28 +44,35 @@ void display_menu()
 
 // }
 
+// populate ramint with lists
+// void set_up_ram_int()
+// {
+// 	for(int i = 1; i <= RAMSIZE; i += 3)
+// 	{
+// 		fill_contig_loc(i);
+// 	}
+// }
 
-void set_up_ram_int()
+
+// void fill_contig_loc(int i)
+// {
+// 	RAMINT[i + 0] = RAMLIST[i].key;
+// 	RAMINT[i + 1] = RAMLIST[i].next;
+// 	RAMINT[i + 2] = RAMLIST[i].prev;
+// }
+
+void disp_ram()
 {
-	for(int i = 1; i <= RAMSIZE; i += 3)
-	{
-		fill_contig_loc(i);
-	}
+	for (int i = 1; i <= RAMSIZE; i ++)
+		printf("|%d|", RAMINT[i - 1]);
+
 }
-
-void fill_contig_loc(int i)
-{
-	RAMINT[i + 0] = RAMLIST[i].key;
-	RAMINT[i + 1] = RAMLIST[i].next;
-	RAMINT[i + 2] = RAMLIST[i].prev;
-}
-
-
 
 
 
 void main()
 {
 	display_menu();
+	disp_ram();
 }
 

@@ -1,14 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define RAMSIZE 20
+#define RAMSIZE 15
 
 //structs
-typedef struct Node_
-{
-	int key;
-	int next;
-	int prev;
-}Node;
 
 typedef struct List_
 {
@@ -19,8 +13,8 @@ typedef struct List_
 
 
 // global variables
-extern int RAMINT[RAMSIZE];
-extern List RAMLIST[RAMSIZE / 3];
+int RAMINT[RAMSIZE];
+extern List existinglists[RAMSIZE / 3];
 extern int NUMLISTS;
 
 // methods
