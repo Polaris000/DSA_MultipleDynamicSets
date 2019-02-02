@@ -25,7 +25,7 @@ void display_menu()
 // 5. Count total elements of a list: Here list is taken as input
 // 6. Display all lists
 // 7. Display free list
-// 8. Preform defragmentation
+// 8. Perform defragmentation
 
 // int select_pref_option()
 // {
@@ -45,34 +45,65 @@ void display_menu()
 // }
 
 // populate ramint with lists
-// void set_up_ram_int()
-// {
-// 	for(int i = 1; i <= RAMSIZE; i += 3)
-// 	{
-// 		fill_contig_loc(i);
-// 	}
-// }
+
+void init_freelist()
+{
+	freelist.lists_head = malloc(sizeof(List));
+	freelist.size = 1;
+	freelist.lists_head[0].head = 1;
+	freelist.lists_head[0].size = RAMSIZE / 3;
+	freelist.lists_head[0].id = 0;
+}
+
+void init_existinglists()
+{
+	existinglists.lists_head = malloc(sizeof(List) * RAMSIZE / 3);
+	existinglists.size = 0;
+}
+
+void init_all()
+{
+	init_freelist();
+	init_existinglists();
+}
+
+void fill_contig_loc(int i)
+{
+	RAMINT[i - 1] = -2;
+	if (i == RAMSIZE - 2)
+		RAMINT[i] = -1;
+	else
+		RAMINT[i] = i + 3;
+	RAMINT[i + 1] = -2;
+}
+
+void set_up_ram_int()
+{
+	for(int i = 1; i <= RAMSIZE; i += 3)
+	{
+		fill_contig_loc(i);
+	}
+}
 
 
-// void fill_contig_loc(int i)
-// {
-// 	RAMINT[i + 0] = RAMLIST[i].key;
-// 	RAMINT[i + 1] = RAMLIST[i].next;
-// 	RAMINT[i + 2] = RAMLIST[i].prev;
-// }
 
 void disp_ram()
 {
 	for (int i = 1; i <= RAMSIZE; i ++)
-		printf("|%d|", RAMINT[i - 1]);
+		printf("| %d |", RAMINT[i - 1]);
 
+	printf(" \t ***\n");
 }
 
 
 
 void main()
 {
+	init_all();
 	display_menu();
 	disp_ram();
+	set_up_ram_int();
+	disp_ram();
+	display_freelist();
 }
 

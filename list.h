@@ -11,10 +11,17 @@ typedef struct List_
 	int id;
 }List;
 
+typedef struct ListofLists_
+{
+	List *lists_head;
+	int size;
+}ListofLists;
+
 
 // global variables
 int RAMINT[RAMSIZE];
-extern List existinglists[RAMSIZE / 3];
-extern int NUMLISTS;
+ListofLists existinglists;
+ListofLists freelist;
 
 // methods
+void display_freelist();

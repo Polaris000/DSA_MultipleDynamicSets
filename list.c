@@ -13,21 +13,21 @@
 // 	return new_node;
 // }
 
-int create_new_list(int new_key)
-{
-	List *new_list = malloc(sizeof(List));
-	new_list -> id = ++NUMLISTS;
-	new_list -> size = 1;
-	new_list -> head = get_next_free_loc();
-	existinglists[new_list -> id] = new_list;
-}
+// int create_new_list(int new_key)
+// {
+// 	List *new_list = malloc(sizeof(List));
+// 	new_list -> id = ++NUMLISTS;
+// 	new_list -> size = 1;
+// 	new_list -> head = get_next_free_loc();
+// 	existinglists[new_list -> id] = new_list;
+// }
 
 
 void display_lists()
 {
-	for(int i = 1; i <= NUMLISTS; i ++)
+	for(int i = 1; i <= existinglists.size; i ++)
 	{
-		int tmp = existinglists[i - 1].head;
+		int tmp = existinglists.lists_head[i - 1].head;
 		printf("Elements of list-%d are: \n", i);
 		printf("key \t next \t prev \n");
 		while(tmp != -1)
@@ -39,24 +39,40 @@ void display_lists()
 			tmp = *(RAMINT + tmp);
 		}
 	}
+}
 
+void display_freelist()
+{
+	int index = freelist.lists_head[0].head;
+	printf("[");
+	while (RAMINT[index] != -1)
+	{
+		printf("%d, ", RAMINT[index]);
+		index += 3;
+	}
+	printf("]\n");
 }
 
 int count_total_ele()
 {
 	int count = 0;
-	for(int i = 1; i <= NUMLISTS; i ++)
-		count += existinglists[i - 1].size;
+	for(int i = 1; i <= existinglists.size; i ++)
+		count += existinglists.lists_head[i - 1].size;
 
 	return count;
 }
 
 int count_ele_list(int list_num)
 {
-	return existinglists[list_num - 1].size;
+	return existinglists.lists_head[list_num - 1].size;
 }
 
-int delete_ele(int list_num, int key)
-{
+// int delete_ele(int list_num, int key)
+// {
  
-}
+// }
+
+// int get_element_with_key(int list_num, int key)
+// {
+
+// }
