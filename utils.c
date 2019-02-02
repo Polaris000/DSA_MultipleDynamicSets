@@ -61,11 +61,6 @@ void init_existinglists()
 	existinglists.size = 0;
 }
 
-void init_all()
-{
-	init_freelist();
-	init_existinglists();
-}
 
 void fill_contig_loc(int i)
 {
@@ -80,9 +75,14 @@ void fill_contig_loc(int i)
 void set_up_ram_int()
 {
 	for(int i = 1; i <= RAMSIZE; i += 3)
-	{
 		fill_contig_loc(i);
-	}
+}
+
+void init_all()
+{
+	init_freelist();
+	init_existinglists();
+	set_up_ram_int();
 }
 
 
@@ -100,10 +100,12 @@ void disp_ram()
 void main()
 {
 	init_all();
-	display_menu();
-	disp_ram();
-	set_up_ram_int();
 	disp_ram();
 	display_freelist();
+
+	display_lists();
+	create_new_list(3);
+	display_lists();
+
 }
 
