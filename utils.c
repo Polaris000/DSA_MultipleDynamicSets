@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "list.h"
+#include "utils.h"
 
 
 
@@ -16,6 +16,9 @@ void display_menu()
 	"7. Display free list  \n"
 	"8. Perform defragmentation  \n"
 	"9. Press 0 to exit  \n");
+
+	printf(" ****************** \n");
+	 // disp_ram();
 }
 
 void disp_ram()
@@ -27,10 +30,19 @@ void disp_ram()
 }
 
 
-void swap(int i, int j)
+void swap(int i, int j, int list_num)
 {
 	int next = RAMINT[i];
 	int prev = RAMINT[i + 1];
+
+	if (next == -1 && prev == -1)
+	{
+		existinglists.lists_head[list_num - 1].head = j;
+		RAMINT[j + 1] = prev;
+		RAMINT[j - 1] = RAMINT[i - 1];
+		RAMINT[j] = next;
+		RAMINT[i - 1] = nullval;
+	}
 
 	// filled node at end of list
 	if (next == -1)
@@ -40,17 +52,17 @@ void swap(int i, int j)
 		RAMINT[j - 1] = RAMINT[i - 1];
 		RAMINT[RAMINT[j + 1]] = j;
 
-		RAMINT[i - 1] = -2; 
+		RAMINT[i - 1] = nullval; 
 	}
 
 	// filled node at head of list
 	else if(prev == -1)
 	{
-		existinglists.lists_head[0].head = j;
+		existinglists.lists_head[list_num].head = j;
 		RAMINT[j + 1] = prev;
 		RAMINT[j - 1] = RAMINT[i - 1];
 		RAMINT[RAMINT[next] + 1] = j;
-		RAMINT[i - 1] = -2;
+		RAMINT[i - 1] = nullval;
 	}
 
 
@@ -59,10 +71,9 @@ void swap(int i, int j)
 	{
 		RAMINT[RAMINT[i + 1]] = j;
 		RAMINT[RAMINT[next] + 1] = j;
-		RAMINT[i - 1] = -2;
+		RAMINT[i - 1] = nullval;
 	}
 
-	// disp_ram();
 }
 
 
@@ -73,14 +84,14 @@ void reset_order()
 	int count = 1;
 	int i = 1;
 	RAMINT[i] = -1;
-	RAMINT[i - 1] = -2;
-	RAMINT[i + 1] = -2;
+	RAMINT[i - 1] = nullval;
+	RAMINT[i + 1] = nullval;
 	while(count < freelist.lists_head[0].size)
 	{
 		printf(" in loop: i %d count %d\n", i, count);
 		RAMINT[i] = i + 3;
-		RAMINT[i - 1] = -2;
-		RAMINT[i + 1] = -2;
+		RAMINT[i - 1] = nullval;
+		RAMINT[i + 1] = nullval;
 		i += 3;
 		count ++;
 	}
@@ -90,17 +101,33 @@ void reset_order()
 
 }
 
+int getlistnum(int i)
+{
+	for(int i = 1; i < existinglists.size; i++)
+	{
+		if (existinglists.lists_head[i - 1].head == i)
+			return i;
+	}
+}
+
 void get_together(int i)
 {
 	int j;
+	int list_num;
 	for(j = RAMSIZE - 2; j >= 1; j -= 3)
 	{
-		if(RAMINT[j - 1] == -2)
+		if(RAMINT[j - 1] == nullval)
 			break;
 	}
+	if (j <= i)
+	{
+		return ;
+	}
 
-	printf("%d %d \n", i , j);
-	swap(i, j);
+	list_num = getlistnum(i);
+
+	printf("%d %d %d\n", i , j, list_num);
+	swap(i, j, list_num);
 	reset_order();
 }
 
@@ -117,15 +144,16 @@ void perform_defragmentation()
 	else
 	{
 		int index = freelist.lists_head[0].head;	
+		int size = freelist.lists_head[0].size;
 		int i;
 
-		for (i = 1; i <= RAMSIZE; i++)
+		for (i = 1; i <= RAMSIZE; i += 3)
 		{
-			if (RAMINT[i - 1] != -2)
+			if (RAMINT[i - 1] != nullval)
 				break;
 		}
 
-		if (i == RAMSIZE + 1)
+		if (i == 3 * size + 1)
 		{
 			printf("INside if defrag\n");
 			reset_order();
@@ -142,42 +170,32 @@ void perform_defragmentation()
 
 }
 
-//
-// Create a new list
-// 2. Insert a new node in a given list in sorted order: Here list and node object is taken as input
-// 3. Delete an element from a given list: Here list and node object is taken as input
-// 4. Count total elements excluding free list
-// 5. Count total elements of a list: Here list is taken as input
-// 6. Display all lists
-// 7. Display free list
-// 8. Perform defragmentation
-
-
-// void create_new_list_menu()
-// {
-// 	printf("The sequence number of the newly created list is: %d", cre
-// 	Enter key value to be inserted in the newly created list-n: here user inputs integer m
-// }
-
 void select_pref_option()
 {
-	printf("Your option: \n");
+	
 	int option;
 
-	scanf("%d", &option);
+	do
+	{
+		printf("Select an option between 0 and 8: ");
+		scanf("%d", &option);
+		getchar();
+	} while (option < 0 || option > 8);
 
 	switch(option)
 	{
-		case 1: create_new_list(); 			break;
-		case 2: insert_new_ele();			break;
-		case 3: delete_ele();				break;
-		case 4:	count_total_ele();			break;
-		case 5: count_ele_list();  			break;
-		case 6: display_lists();     		break;
-		case 7: display_freelist(); 		break;
-		case 8: perform_defragmentation(); 	break;
-		case 9: exit(0); 					break;
+		case 1: create_new_list(); 			break; //done
+		case 2: insert_new_ele();			break; //done
+		case 3: delete_ele();				break; //done
+		case 4:	count_total_ele();			break; //done
+		case 5: count_ele_list();  			break; //done
+		case 6: display_lists();     		break; //done
+		case 7: display_freelist(); 		break; //done
+		case 8: perform_defragmentation(); 	break; //done
+		case 0: exit(0); 					break; //done
 	}
+
+	printf(" ****************** \n");
 
 }
 
@@ -200,12 +218,12 @@ void init_existinglists()
 
 void fill_contig_loc(int i)
 {
-	RAMINT[i - 1] = -2;
+	RAMINT[i - 1] = nullval;
 	if (i == RAMSIZE - 2)
 		RAMINT[i] = -1;
 	else
 		RAMINT[i] = i + 3;
-	RAMINT[i + 1] = -2;
+	RAMINT[i + 1] = nullval;
 }
 
 void set_up_ram_int()
@@ -222,38 +240,38 @@ void init_all()
 }
 
 
-void main()
-{
-	init_all();
-	create_new_list(2);
-	insert_new_ele(1, 3);
-	display_freelist();
-	// display_lists();
-	disp_ram();
-	insert_new_ele(1, 4);
-	display_freelist();
-	// display_lists();
-	disp_ram();
-	insert_new_ele(1, 5);
-	display_freelist();
-	disp_ram();
-	insert_new_ele(1, 7);
-	display_freelist();
-	display_lists();
-	disp_ram();
+// void main()
+// {
+// 	init_all();
+// 	create_new_list(2);
+// 	insert_new_ele(1, 3);
+// 	display_freelist();
+// 	// display_lists();
+// 	disp_ram();
+// 	insert_new_ele(1, 4);
+// 	display_freelist();
+// 	// display_lists();
+// 	disp_ram();
+// 	insert_new_ele(1, 5);
+// 	display_freelist();
+// 	disp_ram();
+// 	insert_new_ele(1, 7);
+// 	display_freelist();
+// 	display_lists();
+// 	disp_ram();
 
-	delete_ele(1, 5);
-	display_freelist();
-	display_lists();
-	disp_ram();
+// 	delete_ele(1, 5);
+// 	display_freelist();
+// 	display_lists();
+// 	disp_ram();
 
-	perform_defragmentation();
-	disp_ram();
-	display_freelist();
-	display_lists();
-	printf("%d", count_total_ele());
-	printf("%d", count_ele_list(1));
+// 	perform_defragmentation();
+// 	disp_ram();
+// 	display_freelist();
+// 	display_lists();
+// 	printf("%d", count_total_ele());
+// 	printf("%d", count_ele_list(1));
 
 
-}
+// }
 
