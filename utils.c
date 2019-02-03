@@ -3,6 +3,7 @@
 #include "list.h"
 
 
+
 void display_menu()
 {
 	printf("Select an option:  \n"
@@ -17,50 +18,129 @@ void display_menu()
 	"9. Press 0 to exit  \n");
 }
 
-// void swap_elements(int index1, int freenode)
-// {
-// 	int free_next = RAMINT[freenode];
-// 	RAMINT[freenode - 1] = RAMINT[index1 - 1];
-// 	RAMINT[freenode] = RAMINT[index1];
-// 	RAMINT[freenode + 1] = RAMINT[index1 + 1];
-// 	RAMINT[index1 - 1] = -2;
-// 	RAMINT[index1] = free_next;
-// 	RAMINT[index1 + 1] = -2;
-// }
+void disp_ram()
+{
+	for (int i = 1; i <= RAMSIZE; i ++)
+		printf("%d (%d) |", RAMINT[i - 1], i);
 
-// int is_freelist_contiguous()
-// {
-// 	int index = freelist.lists_head[0].head;
-// 	while (index != -1)
-// 	{
-// 		printf("%d, ", index);
-// 		// index = RAMINT[index];
-// 		if (index + 3 == RAMINT[index])
-// 			index += 3;
-// 		else
-// 			return index;
-// 	}
-
-// 	return 1;
-// }
-
-// int perform_defragmentation()
-// {
-// 	int index;
-// 	if (index = is_freelist_contiguous())
-// 	{
-// 		printf("Defrag not required...\n");
-// 		return -1;
-// 	}
-
-// 	else
-// 	{
-// 		int head = freelist.lists_head[0].head;
-// 		swap_elements(index);
+	printf(" \t ***\n");
+}
 
 
-// 	}
-// }
+void swap(int i, int j)
+{
+	int next = RAMINT[i];
+	int prev = RAMINT[i + 1];
+
+	// filled node at end of list
+	if (next == -1)
+	{
+		RAMINT[j] = next;
+		RAMINT[j + 1] = prev;
+		RAMINT[j - 1] = RAMINT[i - 1];
+		RAMINT[RAMINT[j + 1]] = j;
+
+		RAMINT[i - 1] = -2; 
+	}
+
+	// filled node at head of list
+	else if(prev == -1)
+	{
+		existinglists.lists_head[0].head = j;
+		RAMINT[j + 1] = prev;
+		RAMINT[j - 1] = RAMINT[i - 1];
+		RAMINT[RAMINT[next] + 1] = j;
+		RAMINT[i - 1] = -2;
+	}
+
+
+	// in the middle
+	else
+	{
+		RAMINT[RAMINT[i + 1]] = j;
+		RAMINT[RAMINT[next] + 1] = j;
+		RAMINT[i - 1] = -2;
+	}
+
+	// disp_ram();
+}
+
+
+void reset_order()
+{
+	freelist.lists_head[0].head = 1;
+	printf("size: %d\n", freelist.lists_head[0].size);
+	int count = 1;
+	int i = 1;
+	RAMINT[i] = -1;
+	RAMINT[i - 1] = -2;
+	RAMINT[i + 1] = -2;
+	while(count < freelist.lists_head[0].size)
+	{
+		printf(" in loop: i %d count %d\n", i, count);
+		RAMINT[i] = i + 3;
+		RAMINT[i - 1] = -2;
+		RAMINT[i + 1] = -2;
+		i += 3;
+		count ++;
+	}
+
+	RAMINT[i] = -1;
+
+
+}
+
+void get_together(int i)
+{
+	int j;
+	for(j = RAMSIZE - 2; j >= 1; j -= 3)
+	{
+		if(RAMINT[j - 1] == -2)
+			break;
+	}
+
+	printf("%d %d \n", i , j);
+	swap(i, j);
+	reset_order();
+}
+
+
+
+
+void perform_defragmentation()
+{
+	int index = 0;
+
+	if(freelist.lists_head[0].size == 0)
+		printf("Nothing free!\n");
+
+	else
+	{
+		int index = freelist.lists_head[0].head;	
+		int i;
+
+		for (i = 1; i <= RAMSIZE; i++)
+		{
+			if (RAMINT[i - 1] != -2)
+				break;
+		}
+
+		if (i == RAMSIZE + 1)
+		{
+			printf("INside if defrag\n");
+			reset_order();
+		}
+
+		else
+		{
+			printf("INside else defrag\n");
+			get_together(i);
+		}
+
+	}
+
+
+}
 
 //
 // Create a new list
@@ -79,22 +159,27 @@ void display_menu()
 // 	Enter key value to be inserted in the newly created list-n: here user inputs integer m
 // }
 
-// int select_pref_option()
-// {
-// 	printf("Your option: \n");
-// 	int option;
+void select_pref_option()
+{
+	printf("Your option: \n");
+	int option;
 
-// 	scanf("%d", &option);
+	scanf("%d", &option);
 
-// 	switch(option)
-// 	{
-// 		case 0:
-// 			return -1;
-// 		case 1: create_new_list_menu(); break;
-// 		case 2: insert_new_ele()
-// 	}
+	switch(option)
+	{
+		case 1: create_new_list(); 			break;
+		case 2: insert_new_ele();			break;
+		case 3: delete_ele();				break;
+		case 4:	count_total_ele();			break;
+		case 5: count_ele_list();  			break;
+		case 6: display_lists();     		break;
+		case 7: display_freelist(); 		break;
+		case 8: perform_defragmentation(); 	break;
+		case 9: exit(0); 					break;
+	}
 
-// }
+}
 
 
 void init_freelist()
@@ -137,38 +222,22 @@ void init_all()
 }
 
 
-
-void disp_ram()
-{
-	for (int i = 1; i <= RAMSIZE; i ++)
-		printf("%d (%d) |", RAMINT[i - 1], i);
-
-	printf(" \t ***\n");
-
-;
-
-	printf(" \t ***\n");
-}
-
-
-
 void main()
 {
 	init_all();
-	create_new_list(3);
-	
+	create_new_list(2);
+	insert_new_ele(1, 3);
+	display_freelist();
+	// display_lists();
+	disp_ram();
 	insert_new_ele(1, 4);
-	// display_freelist();
+	display_freelist();
 	// display_lists();
-	// disp_ram();
-
-	insert_new_ele(1, 2);
-	// display_freelist();
-	// display_lists();
-	// disp_ram();
-
+	disp_ram();
 	insert_new_ele(1, 5);
-	//insert_new_ele(1, 8);
+	display_freelist();
+	disp_ram();
+	insert_new_ele(1, 7);
 	display_freelist();
 	display_lists();
 	disp_ram();
@@ -178,6 +247,10 @@ void main()
 	display_lists();
 	disp_ram();
 
+	perform_defragmentation();
+	disp_ram();
+	display_freelist();
+	display_lists();
 	printf("%d", count_total_ele());
 	printf("%d", count_ele_list(1));
 

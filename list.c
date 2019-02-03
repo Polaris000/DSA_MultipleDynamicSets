@@ -4,8 +4,10 @@
 
 
 // creating and inserting -----------------------------------------------
-int insert_new_ele(int list_num, int new_key)
+void insert_new_ele(int list_num, int new_key)
 {
+
+
 	if(get_element_with_key(list_num, new_key) != -1)
 		return -1;
 
@@ -51,10 +53,10 @@ int insert_new_ele(int list_num, int new_key)
 	}
 }
 
-int create_new_list(int new_key)
+void create_new_list()
 {
 	if(overflow_check())
-		return -1;
+		printf("FAILURE: MEMORY NOT AVAILABLE \n");
 	else
 	{
 		int free_space = pop_from_freelist();
@@ -63,13 +65,19 @@ int create_new_list(int new_key)
 		//printf("free space: %d", free_space);
 		new_list.size = 1;
 		new_list.id = ++existinglists.size;
+		printf("The sequence number of the newly created list is: %d \n", new_list.id);
+		printf("Enter key value to be inserted in the newly created list-%d: ");
+
+		int new_key;
+		scanf("%d", &new_key);
+		getchar();
 		existinglists.lists_head[existinglists.size - 1] = new_list;
 		RAMINT[free_space] = -1;
 		RAMINT[free_space - 1] = new_key;
 		RAMINT[free_space + 1] = -1;
-		printf("list id: %d \n", new_list.id);
-		printf("%d \t %d \t %d \n", RAMINT[free_space - 1], RAMINT[free_space], RAMINT[free_space + 1]);
-		return new_list.id;	
+		// printf("list id: %d \n", new_list.id);
+		// printf("%d \t %d \t %d \n", RAMINT[free_space - 1], RAMINT[free_space], RAMINT[free_space + 1]);
+		printf("SUCCESS\n");
 	}
 }
 
@@ -81,21 +89,33 @@ int get_tail_index()
 {
 	int start = freelist.lists_head[0].head;
 
-		while(RAMINT[start] != -1)
-		{
-			start += 3;
-		}
+	if (freelist.lists_head[0].size == 0)
+	{
+		return -1;
+	}
+
+	while(RAMINT[start] != -1)
+	{
+		start = RAMINT[start];
+	}
 
 	return start;
 }
 
 int get_second_last_index()
 {
+	printf("inside second last index\n");
 	int start = freelist.lists_head[0].head;
+	printf("start %d \n", start);
 
-		while(RAMINT[RAMINT[start]] != -1)
+	if (freelist.lists_head[0].size < 2)
+		return -1;
+
+	int count = 0;
+		while((RAMINT[RAMINT[start]] != -1) && (count <= freelist.lists_head[0].size))
 		{
-			start += 3;
+			start = RAMINT[start];
+			count ++;
 		}
 
 	return start;
@@ -108,19 +128,42 @@ int push_to_freelist(int index)
 	else
 	{
 		int start = get_tail_index();
+		if (start == -1)
+		{
+			freelist.lists_head[0].head = index;
+			RAMINT[index - 1] = -2;
+			RAMINT[index + 1] = -2;
+			RAMINT[index] = -1;\
+			freelist.lists_head[0].size ++;
+			return 0;
+		}
+
 		RAMINT[start] = index;
 		RAMINT[index - 1] = -2;
 		RAMINT[index + 1] = -2;
 		RAMINT[index] = -1;
 		freelist.lists_head[0].size ++;
+
 		return 0;
 	}
 }
 
 int pop_from_freelist()
 {
-	if(underflow_check())
+
+	printf("INside pop from freelist\n");
+	int underflow_return = underflow_check();
+
+	if(underflow_return == 1)
 		return -1;
+
+	else if (underflow_return == 2)
+	{
+		freelist.lists_head[0].size --;
+		int free_space = freelist.lists_head[0].head;
+		freelist.lists_head[0].head = -1;
+		return free_space;
+	}
 
 	else
 	{
@@ -130,6 +173,7 @@ int pop_from_freelist()
 		RAMINT[start] = -1;
 		freelist.lists_head[0].size --;
 		printf("free space %d \n", free_space);
+
 		return free_space;
 	}
 }
@@ -144,8 +188,14 @@ int overflow_check()
 
 int underflow_check()
 {
+	//return 1  if size == 0
+	// return 0 if size > 1
+	// return 2 if size == 1
+
 	if (freelist.lists_head[0].size == 0)
 		return 1;
+	else if(freelist.lists_head[0].size == 1)
+		return 2;
 	else
 		return 0;
 }
@@ -174,6 +224,7 @@ int delete_ele(int list_num, int key)
 		printf("inside del index is %d:\n", index);
 		int prev = RAMINT[index + 1];
 		RAMINT[prev] = RAMINT[index];
+		RAMINT[RAMINT[index] + 1] = prev;
 		existinglists.lists_head[list_num - 1].size --;
 		push_to_freelist(index);
 		return 0;
@@ -221,18 +272,22 @@ void display_freelist()
 
 
 // count all elements
-int count_total_ele()
+void count_total_ele()
 {
 	int count = 0;
 	for(int i = 1; i <= existinglists.size; i ++)
 		count += existinglists.lists_head[i - 1].size;
 
-	return count;
+	printf("Total number of nodes in all lists are %d.\n", count);
 }
 
-int count_ele_list(int list_num)
+void count_ele_list()
 {
-	return existinglists.lists_head[list_num - 1].size;
+	int list_num;
+	printf("Enter the list number: ");
+	scanf("%d", &list_num);
+	int count = existinglists.lists_head[list_num - 1].size;
+	printf("Total number of nodes in list %d are %d.\n", list_num, count);
 }
 // --------------------------------------------------------------
 
