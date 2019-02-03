@@ -18,7 +18,7 @@ void display_menu()
 	"9. Press 0 to exit  \n");
 
 	printf(" ****************** \n");
-	disp_ram();
+	 // disp_ram();
 }
 
 void disp_ram()
@@ -41,7 +41,7 @@ void swap(int i, int j, int list_num)
 		RAMINT[j + 1] = prev;
 		RAMINT[j - 1] = RAMINT[i - 1];
 		RAMINT[j] = next;
-		RAMINT[i - 1] = -2;
+		RAMINT[i - 1] = nullval;
 	}
 
 	// filled node at end of list
@@ -52,7 +52,7 @@ void swap(int i, int j, int list_num)
 		RAMINT[j - 1] = RAMINT[i - 1];
 		RAMINT[RAMINT[j + 1]] = j;
 
-		RAMINT[i - 1] = -2; 
+		RAMINT[i - 1] = nullval; 
 	}
 
 	// filled node at head of list
@@ -62,7 +62,7 @@ void swap(int i, int j, int list_num)
 		RAMINT[j + 1] = prev;
 		RAMINT[j - 1] = RAMINT[i - 1];
 		RAMINT[RAMINT[next] + 1] = j;
-		RAMINT[i - 1] = -2;
+		RAMINT[i - 1] = nullval;
 	}
 
 
@@ -71,7 +71,7 @@ void swap(int i, int j, int list_num)
 	{
 		RAMINT[RAMINT[i + 1]] = j;
 		RAMINT[RAMINT[next] + 1] = j;
-		RAMINT[i - 1] = -2;
+		RAMINT[i - 1] = nullval;
 	}
 
 }
@@ -84,14 +84,14 @@ void reset_order()
 	int count = 1;
 	int i = 1;
 	RAMINT[i] = -1;
-	RAMINT[i - 1] = -2;
-	RAMINT[i + 1] = -2;
+	RAMINT[i - 1] = nullval;
+	RAMINT[i + 1] = nullval;
 	while(count < freelist.lists_head[0].size)
 	{
 		printf(" in loop: i %d count %d\n", i, count);
 		RAMINT[i] = i + 3;
-		RAMINT[i - 1] = -2;
-		RAMINT[i + 1] = -2;
+		RAMINT[i - 1] = nullval;
+		RAMINT[i + 1] = nullval;
 		i += 3;
 		count ++;
 	}
@@ -116,7 +116,7 @@ void get_together(int i)
 	int list_num;
 	for(j = RAMSIZE - 2; j >= 1; j -= 3)
 	{
-		if(RAMINT[j - 1] == -2)
+		if(RAMINT[j - 1] == nullval)
 			break;
 	}
 	if (j <= i)
@@ -149,7 +149,7 @@ void perform_defragmentation()
 
 		for (i = 1; i <= RAMSIZE; i += 3)
 		{
-			if (RAMINT[i - 1] != -2)
+			if (RAMINT[i - 1] != nullval)
 				break;
 		}
 
@@ -172,11 +172,15 @@ void perform_defragmentation()
 
 void select_pref_option()
 {
-	printf("Your option: ");
+	
 	int option;
 
-	scanf("%d", &option);
-	getchar();
+	do
+	{
+		printf("Select an option between 0 and 8: ");
+		scanf("%d", &option);
+		getchar();
+	} while (option < 0 || option > 8);
 
 	switch(option)
 	{
@@ -214,12 +218,12 @@ void init_existinglists()
 
 void fill_contig_loc(int i)
 {
-	RAMINT[i - 1] = -2;
+	RAMINT[i - 1] = nullval;
 	if (i == RAMSIZE - 2)
 		RAMINT[i] = -1;
 	else
 		RAMINT[i] = i + 3;
-	RAMINT[i + 1] = -2;
+	RAMINT[i + 1] = nullval;
 }
 
 void set_up_ram_int()

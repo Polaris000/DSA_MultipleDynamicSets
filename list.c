@@ -145,16 +145,16 @@ int push_to_freelist(int index)
 		if (start == -1)
 		{
 			freelist.lists_head[0].head = index;
-			RAMINT[index - 1] = -2;
-			RAMINT[index + 1] = -2;
+			RAMINT[index - 1] = nullval;
+			RAMINT[index + 1] = nullval;
 			RAMINT[index] = -1;\
 			freelist.lists_head[0].size ++;
 			return 0;
 		}
 
 		RAMINT[start] = index;
-		RAMINT[index - 1] = -2;
-		RAMINT[index + 1] = -2;
+		RAMINT[index - 1] = nullval;
+		RAMINT[index + 1] = nullval;
 		RAMINT[index] = -1;
 		freelist.lists_head[0].size ++;
 
