@@ -4,69 +4,83 @@
 
 
 // creating and inserting -----------------------------------------------
-void insert_new_ele(int list_num, int new_key)
+void insert_new_ele()
 {
 
+	printf("inside ELSE for insert_new_ele #\n");
+	int list_num, new_key;
+	int free_space;
 
-	if(get_element_with_key(list_num, new_key) != -1)
-		return -1;
+	printf("List you want to insert in: ");
+	scanf("%d", &list_num);
+	getchar();
+	printf("Enter the key value: ");
+	scanf("%d", &new_key);
+
+	if (list_num > existinglists.size)
+		{
+			printf("List does not exist\n");
+			return ;
+		}
 
 	else
-	{
-		printf("inside else for insert_new_ele #\n");
-
-		int free_space;
-		if((free_space = pop_from_freelist()) == -1)
-				return -2; 
-		existinglists.lists_head[list_num - 1].size ++;
-		int current = existinglists.lists_head[list_num - 1].head;
-		int prev = RAMINT[current + 1];
-
-		printf("insert current and prev at start %d %d\n", current, prev);
-
-		if (new_key < RAMINT[current - 1])
 		{
-			printf("insert if new key < current #\n");
-			existinglists.lists_head[list_num - 1].head = free_space;
+			if((free_space = pop_from_freelist()) == -1)
+				printf("FAILURE: MEMORY NOT AVAILABLE\n");
+
+			existinglists.lists_head[list_num - 1].size ++;
+			int current = existinglists.lists_head[list_num - 1].head;
+			int prev = RAMINT[current + 1];
+
+			printf("insert current and prev at start %d %d\n", current, prev);
+
+			if (new_key < RAMINT[current - 1])
+			{
+				printf("insert if new key < current #\n");
+				existinglists.lists_head[list_num - 1].head = free_space;
+				RAMINT[free_space - 1] = new_key;
+				RAMINT[free_space] = current;
+				RAMINT[free_space + 1] = -1;
+				RAMINT[current + 1] = free_space;
+				return ;
+			}
+
+			while(current != -1 && RAMINT[current - 1] <= new_key)
+			{
+				printf("insert current and prev in loop %d %d\n", current, prev);
+				prev = current;
+				current = RAMINT[current];
+			}
+
+			printf("inside else for insert_new_ele ###\n");
+			RAMINT[prev] = free_space;
+			RAMINT[free_space] = current ;
 			RAMINT[free_space - 1] = new_key;
-			RAMINT[free_space] = current;
-			RAMINT[free_space + 1] = -1;
-			RAMINT[current + 1] = free_space;
-			return 0;
+			RAMINT[free_space + 1] = prev;
+
+			printf("SUCCESS: element added\n");
 		}
 
-		while(current != -1 && RAMINT[current - 1] <= new_key)
-		{
-			printf("insert current and prev in loop %d %d\n", current, prev);
-			prev = current;
-			current = RAMINT[current];
-		}
-
-		printf("inside else for insert_new_ele ###\n");
-		RAMINT[prev] = free_space;
-		RAMINT[free_space] = current ;
-		RAMINT[free_space - 1] = new_key;
-		RAMINT[free_space + 1] = prev;
-		
-
-		return 0;
-	}
 }
 
 void create_new_list()
 {
 	if(overflow_check())
 		printf("FAILURE: MEMORY NOT AVAILABLE \n");
+
 	else
 	{
 		int free_space = pop_from_freelist();
+		printf("free_space:-> %d\n", free_space);
 		List new_list = existinglists.lists_head[existinglists.size - 1];
 		new_list.head = free_space;
 		//printf("free space: %d", free_space);
 		new_list.size = 1;
-		new_list.id = ++existinglists.size;
+		existinglists.size ++;
+		new_list.id = existinglists.size;
+		printf("list size: %d\n", existinglists.size);
 		printf("The sequence number of the newly created list is: %d \n", new_list.id);
-		printf("Enter key value to be inserted in the newly created list-%d: ");
+		printf("Enter key value to be inserted in the newly created list-%d: ", new_list.id);
 
 		int new_key;
 		scanf("%d", &new_key);
@@ -188,7 +202,7 @@ int overflow_check()
 
 int underflow_check()
 {
-	//return 1  if size == 0
+	// return 1  if size == 0
 	// return 0 if size > 1
 	// return 2 if size == 1
 
@@ -203,22 +217,33 @@ int underflow_check()
 // --------------------------------------------------------------
 
 // Delete element --------------------------------------------------
-int delete_ele(int list_num, int key)
+void delete_ele()
 {
-	int index;
+	int index, list_num, key;
 	printf("inside del\n");
-	if ((index = get_element_with_key(list_num, key)) == -1 || existinglists.lists_head[list_num - 1].size == 0)
-		return -1;
-	else
-	{
 
+	printf("List you want to delete from: ");
+	scanf("%d", &list_num);
+	getchar();
+	printf("Enter the key value: ");
+	scanf("%d", &key);
+
+
+	if ((index = get_element_with_key(list_num, key)) == -1 || existinglists.lists_head[list_num - 1].size == 0)
+	{
+		printf("FAILURE: ELEMENT DOES NOT EXIST OR LIST IS EMPTY\n");
+	}
+
+	else
+	{	
+		// element at head of list
 		if (index == existinglists.lists_head[list_num - 1].head)
 		{
 			printf("inside if of del \n");
 			existinglists.lists_head[list_num - 1].head = RAMINT[index];
 			RAMINT[RAMINT[index] + 1] = -1;
 			push_to_freelist(index);
-			return 0;
+			return ;
 		}
 
 		printf("inside del index is %d:\n", index);
@@ -227,7 +252,7 @@ int delete_ele(int list_num, int key)
 		RAMINT[RAMINT[index] + 1] = prev;
 		existinglists.lists_head[list_num - 1].size --;
 		push_to_freelist(index);
-		return 0;
+		return ;
 	}
 
 }
@@ -235,9 +260,12 @@ int delete_ele(int list_num, int key)
 // display all lists --------------------------------------------
 void display_lists()
 {
-
+	printf("size: %d\n", existinglists.size);
 	if(existinglists.size == 0)
+	{
 		printf("Nothing here!\n");
+		return ;
+	}
 
 	for(int i = 1; i <= existinglists.size; i ++)
 	{
@@ -286,6 +314,12 @@ void count_ele_list()
 	int list_num;
 	printf("Enter the list number: ");
 	scanf("%d", &list_num);
+	if (list_num > existinglists.size)
+	{
+		printf("FAILURE: LIST DOES NOT EXIST\n");
+		return ;
+	}
+
 	int count = existinglists.lists_head[list_num - 1].size;
 	printf("Total number of nodes in list %d are %d.\n", list_num, count);
 }

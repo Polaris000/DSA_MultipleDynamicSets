@@ -1,16 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "utils.h"
+
 
 
 int main()
 {
-
+	init_all();
 	while(1)
 	{
 		display_menu();
-
-		if(!select_pref_option())
-			break;
+		select_pref_option();
 	}
 
 	return 0;
