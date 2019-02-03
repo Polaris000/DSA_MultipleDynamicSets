@@ -10,16 +10,20 @@ int insert_new_ele(int list_num, int new_key)
 		return -1;
 	else
 	{
+		printf("inside else for insert_new_ele #\n");
 		int free_space;
 		existinglists.lists_head[list_num - 1].size ++;
 		if((free_space = pop_from_freelist()) == -1)
 			return -2;
 
-		int prev = existinglists.lists_head[list_num - 1].head;
-		int current = RAMINT[prev];
+		int current = existinglists.lists_head[list_num - 1].head;
+		int prev = RAMINT[current + 1];
 
-		if (new_key < current)
+		printf("insert current and prev at start %d %d\n", current, prev);
+
+		if (new_key < RAMINT[current - 1])
 		{
+			printf("insert if new key < current #\n");
 			existinglists.lists_head[list_num - 1].head = free_space;
 			RAMINT[free_space - 1] = new_key;
 			RAMINT[free_space] = prev;
@@ -27,17 +31,20 @@ int insert_new_ele(int list_num, int new_key)
 			return 0;
 		}
 
-		while(RAMINT[current] != -1)
+		while(current != -1)
 		{
+			printf("inside else for insert_new_ele ##\n");
 			if(RAMINT[current - 1] > new_key)
 			{
+				printf("inside else for insert_new_ele ###\n");
 				RAMINT[prev] = free_space;
 				RAMINT[free_space] = current ;
 				return 0;
 			}
 
-			current += 3;
-			prev += 3;
+			prev = current;
+			current = RAMINT[current];
+			
 		}
 
 		RAMINT[current] = free_space;
@@ -62,12 +69,15 @@ int create_new_list(int new_key)
 		int free_space = pop_from_freelist();
 		List new_list = existinglists.lists_head[existinglists.size - 1];
 		new_list.head = free_space;
+		printf("free space: %d", free_space);
 		new_list.size = 1;
 		new_list.id = ++existinglists.size;
+		existinglists.lists_head[existinglists.size - 1] = new_list;
 		RAMINT[free_space] = -1;
 		RAMINT[free_space - 1] = new_key;
 		RAMINT[free_space + 1] = -1;
-
+		printf("list id: %d \n", new_list.id);
+		printf("%d \t %d \t %d \n", RAMINT[free_space - 1], RAMINT[free_space], RAMINT[free_space + 1]);
 		return 0;	
 	}
 }
@@ -123,9 +133,11 @@ int pop_from_freelist()
 	else
 	{
 		int start = get_second_last_index();
+		printf("second last %d\n", start);
 		int free_space = RAMINT[start];
 		RAMINT[start] = -1;
 		freelist.lists_head[0].size --;
+		printf("free space %d \n", free_space);
 		return free_space;
 	}
 }
@@ -177,12 +189,14 @@ void display_lists()
 		int tmp = existinglists.lists_head[i - 1].head;
 		printf("Elements of list-%d are: \n", i);
 		printf("key \t next \t prev \n");
+
+
 		while(tmp != -1)
 		{
 			printf("%d \t ", *(RAMINT + tmp - 1));
 			printf("%d \t ", *(RAMINT + tmp));
 			printf("%d \n ", *(RAMINT + tmp + 1));
-
+			printf("tmp in display lists : %d\n", tmp);
 			tmp = *(RAMINT + tmp);
 		}
 	}
@@ -192,10 +206,10 @@ void display_freelist()
 {
 	int index = freelist.lists_head[0].head;
 	printf("[");
-	while (RAMINT[index] != -1)
+	while (index != -1)
 	{
-		printf("%d, ", RAMINT[index]);
-		index += 3;
+		printf("%d, ", index);
+		index = RAMINT[index];
 	}
 	printf("]\n");
 }
@@ -224,11 +238,16 @@ int get_element_with_key(int list_num, int key)
 	List required_list = existinglists.lists_head[list_num - 1];
 
 	int index = required_list.head;
+	printf("%d \n ", index);
+	// printf("inside get ele #\n");
 
-	while (RAMINT[index - 1] != -1)
+	while (RAMINT[index] != -1)
 	{
+		//printf("inside get ele ##\n");
 		if (RAMINT[index - 1] == key)
 			return index;
+		//printf("%d \n ", index);
+		index += 3;
 	}
 
 	return -1;

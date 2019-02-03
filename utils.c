@@ -44,7 +44,7 @@ void display_menu()
 
 // }
 
-// populate ramint with lists
+// populate ramint with lists  
 
 void init_freelist()
 {
@@ -105,6 +105,11 @@ void main()
 
 	display_lists();
 	create_new_list(3);
+	display_lists();
+	disp_ram();
+	display_freelist();
+	printf("%d \n", insert_new_ele(1, 5));
+	display_freelist();
 	display_lists();
 
 }
