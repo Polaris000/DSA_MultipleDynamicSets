@@ -8,14 +8,15 @@ int insert_new_ele(int list_num, int new_key)
 {
 	if(get_element_with_key(list_num, new_key) != -1)
 		return -1;
+
 	else
 	{
 		printf("inside else for insert_new_ele #\n");
-		int free_space;
-		existinglists.lists_head[list_num - 1].size ++;
-		if((free_space = pop_from_freelist()) == -1)
-			return -2;
 
+		int free_space;
+		if((free_space = pop_from_freelist()) == -1)
+				return -2; 
+		existinglists.lists_head[list_num - 1].size ++;
 		int current = existinglists.lists_head[list_num - 1].head;
 		int prev = RAMINT[current + 1];
 
@@ -26,42 +27,32 @@ int insert_new_ele(int list_num, int new_key)
 			printf("insert if new key < current #\n");
 			existinglists.lists_head[list_num - 1].head = free_space;
 			RAMINT[free_space - 1] = new_key;
-			RAMINT[free_space] = prev;
+			RAMINT[free_space] = current;
 			RAMINT[free_space + 1] = -1;
+			RAMINT[current + 1] = free_space;
 			return 0;
 		}
 
-		while(current != -1)
+		while(current != -1 && RAMINT[current - 1] <= new_key)
 		{
-			printf("inside else for insert_new_ele ##\n");
-			if(RAMINT[current - 1] > new_key)
-			{
-				printf("inside else for insert_new_ele ###\n");
-				RAMINT[prev] = free_space;
-				RAMINT[free_space] = current ;
-				return 0;
-			}
-
+			printf("insert current and prev in loop %d %d\n", current, prev);
 			prev = current;
 			current = RAMINT[current];
-			
 		}
 
-		RAMINT[current] = free_space;
+		printf("inside else for insert_new_ele ###\n");
+		RAMINT[prev] = free_space;
+		RAMINT[free_space] = current ;
+		RAMINT[free_space - 1] = new_key;
+		RAMINT[free_space + 1] = prev;
+		
 
 		return 0;
-
 	}
 }
 
 int create_new_list(int new_key)
 {
-	// existinglists[size - 1].head = *******;
-	// new_list -> id = ++existinglists.size;
-	// new_list -> size = 1;
-	// new_list -> head = get_next_free_loc(); 
-	// existinglists[new_list -> id] = new_list;
-
 	if(overflow_check())
 		return -1;
 	else
@@ -69,7 +60,7 @@ int create_new_list(int new_key)
 		int free_space = pop_from_freelist();
 		List new_list = existinglists.lists_head[existinglists.size - 1];
 		new_list.head = free_space;
-		printf("free space: %d", free_space);
+		//printf("free space: %d", free_space);
 		new_list.size = 1;
 		new_list.id = ++existinglists.size;
 		existinglists.lists_head[existinglists.size - 1] = new_list;
@@ -78,7 +69,7 @@ int create_new_list(int new_key)
 		RAMINT[free_space + 1] = -1;
 		printf("list id: %d \n", new_list.id);
 		printf("%d \t %d \t %d \n", RAMINT[free_space - 1], RAMINT[free_space], RAMINT[free_space + 1]);
-		return 0;	
+		return new_list.id;	
 	}
 }
 
@@ -120,6 +111,7 @@ int push_to_freelist(int index)
 		RAMINT[start] = index;
 		RAMINT[index - 1] = -2;
 		RAMINT[index + 1] = -2;
+		RAMINT[index] = -1;
 		freelist.lists_head[0].size ++;
 		return 0;
 	}
@@ -164,10 +156,22 @@ int underflow_check()
 int delete_ele(int list_num, int key)
 {
 	int index;
+	printf("inside del\n");
 	if ((index = get_element_with_key(list_num, key)) == -1 || existinglists.lists_head[list_num - 1].size == 0)
 		return -1;
 	else
 	{
+
+		if (index == existinglists.lists_head[list_num - 1].head)
+		{
+			printf("inside if of del \n");
+			existinglists.lists_head[list_num - 1].head = RAMINT[index];
+			RAMINT[RAMINT[index] + 1] = -1;
+			push_to_freelist(index);
+			return 0;
+		}
+
+		printf("inside del index is %d:\n", index);
 		int prev = RAMINT[index + 1];
 		RAMINT[prev] = RAMINT[index];
 		existinglists.lists_head[list_num - 1].size --;
@@ -195,8 +199,8 @@ void display_lists()
 		{
 			printf("%d \t ", *(RAMINT + tmp - 1));
 			printf("%d \t ", *(RAMINT + tmp));
-			printf("%d \n ", *(RAMINT + tmp + 1));
-			printf("tmp in display lists : %d\n", tmp);
+			printf("%d \n", *(RAMINT + tmp + 1));
+			 // printf("tmp in display lists : %d\n", tmp);
 			tmp = *(RAMINT + tmp);
 		}
 	}
@@ -239,15 +243,15 @@ int get_element_with_key(int list_num, int key)
 
 	int index = required_list.head;
 	printf("%d \n ", index);
-	// printf("inside get ele #\n");
+	//printf("inside get ele #\n");
 
-	while (RAMINT[index] != -1)
+	while (index != -1)
 	{
-		//printf("inside get ele ##\n");
+		 // printf("inside get ele ##\n");
 		if (RAMINT[index - 1] == key)
 			return index;
 		//printf("%d \n ", index);
-		index += 3;
+		index = RAMINT[index];
 	}
 
 	return -1;
