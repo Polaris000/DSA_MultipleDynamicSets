@@ -3,6 +3,7 @@
 #include "utils.h"
 
 
+// display -----------------------------------------------------------
 void display_menu()
 {
 	printf("Select an option:  \n"
@@ -17,7 +18,6 @@ void display_menu()
 	"9. Press 0 to exit  \n");
 
 	printf(" ****************** \n");
-	disp_ram();
 }
 
 
@@ -30,11 +30,13 @@ void disp_ram()
 }
 
 
+// defragmentation ------------------------------------------------	
 void swap(int i, int j, int list_num)
 {
 	int next = RAM[i];
 	int prev = RAM[i + 1];
 
+	// filled node is only node in list
 	if (next == -1 && prev == -1)
 	{
 		existinglists.lists_head[list_num - 1].head = j;
@@ -78,7 +80,6 @@ void swap(int i, int j, int list_num)
 void reset_order()
 {
 	freelist.lists_head[0].head = 1;
-	printf("size: %d\n", freelist.lists_head[0].size);
 	int count = 1;
 	int i = 1;
 	RAM[i] = -1;
@@ -86,7 +87,6 @@ void reset_order()
 	RAM[i + 1] = nullval;
 	while(count < freelist.lists_head[0].size)
 	{
-		printf(" in loop: i %d count %d\n", i, count);
 		RAM[i] = i + 3;
 		RAM[i - 1] = nullval;
 		RAM[i + 1] = nullval;
@@ -97,12 +97,21 @@ void reset_order()
 	RAM[i] = -1;
 }
 
+
 int getlistnum(int i)
 {
-	for(int i = 1; i < existinglists.size; i++)
+	int prev = RAM[i + 1];
+
+	while(prev != -1)
 	{
-		if (existinglists.lists_head[i - 1].head == i)
-			return i;
+		prev = RAM[prev + 1];
+		i = RAM[i + 1];
+	}
+
+	for(int j = 1; j <= existinglists.size; j ++)
+	{
+		if(existinglists.lists_head[j - 1].head == i)
+			return j;
 	}
 }
 
@@ -120,16 +129,7 @@ void get_together()
 	}
 
 	if (i == 3 * size + 1)
-	{
-		printf("INside if defrag\n");
 		return ;
-	}
-
-	else
-	{
-		printf("INside else defrag\n");
-	}
-
 
 	int j;
 	int list_num;
@@ -145,32 +145,26 @@ void get_together()
 	}
 
 	list_num = getlistnum(i);
-
-	printf("%d %d %d\n", i , j, list_num);
 	swap(i, j, list_num);
 	get_together();
 }
 
+
 void perform_defragmentation()
 {
-	int index = 0;
-
-	if(freelist.lists_head[0].size == 0)
-		printf("Nothing free!\n");
-
-	else
-	{
-		get_together();
-		reset_order();
-	}
+	get_together();
+	reset_order();
+	printf("SUCCESS: RAM DEFRAGMENTED \n");
 }
+// ---------------------------------------------------------------
 
+// select option in menu -----------------------------------------
 void select_pref_option()
 {
 	int option = 0;
 	do
 	{
-		printf("Select an integer between 0 and 8: ");
+		printf("Select an option between 0 and 8: ");
 		scanf("%d", &option);
 		getchar();
 		printf(" \n");
@@ -192,7 +186,7 @@ void select_pref_option()
 	printf(" \n"); printf(" \t ****************** \n"); printf(" \n");
 }
 
-
+// init ----------------------------------------------------------
 void init_freelist()
 {
 	freelist.lists_head = malloc(sizeof(List));
@@ -231,5 +225,6 @@ void init_all()
 	init_existinglists();
 	set_up_ram_int();
 }
-
+ 
+// ----------------------------------------------------------
 
