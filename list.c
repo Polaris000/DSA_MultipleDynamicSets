@@ -26,37 +26,40 @@ void insert_new_ele()
 	else
 		{
 			if((free_space = pop_from_freelist()) == -1)
-				printf("FAILURE: MEMORY NOT AVAILABLE\n");
-
-			existinglists.lists_head[list_num - 1].size ++;
-			int current = existinglists.lists_head[list_num - 1].head;
-			int prev = RAMINT[current + 1];
-
-			printf("insert current and prev at start %d %d\n", current, prev);
-
-			if (new_key < RAMINT[current - 1])
 			{
-				printf("insert if new key < current #\n");
-				existinglists.lists_head[list_num - 1].head = free_space;
-				RAMINT[free_space - 1] = new_key;
-				RAMINT[free_space] = current;
-				RAMINT[free_space + 1] = -1;
-				RAMINT[current + 1] = free_space;
+				printf("FAILURE: MEMORY NOT AVAILABLE\n");
 				return ;
 			}
 
-			while(current != -1 && RAMINT[current - 1] <= new_key)
+			existinglists.lists_head[list_num - 1].size ++;
+			int current = existinglists.lists_head[list_num - 1].head;
+			int prev = RAM[current + 1];
+
+			printf("insert current and prev at start %d %d\n", current, prev);
+
+			if (new_key < RAM[current - 1])
+			{
+				printf("insert if new key < current #\n");
+				existinglists.lists_head[list_num - 1].head = free_space;
+				RAM[free_space - 1] = new_key;
+				RAM[free_space] = current;
+				RAM[free_space + 1] = -1;
+				RAM[current + 1] = free_space;
+				return ;
+			}
+
+			while(current != -1 && RAM[current - 1] <= new_key)
 			{
 				printf("insert current and prev in loop %d %d\n", current, prev);
 				prev = current;
-				current = RAMINT[current];
+				current = RAM[current];
 			}
 
 			printf("inside else for insert_new_ele ###\n");
-			RAMINT[prev] = free_space;
-			RAMINT[free_space] = current ;
-			RAMINT[free_space - 1] = new_key;
-			RAMINT[free_space + 1] = prev;
+			RAM[prev] = free_space;
+			RAM[free_space] = current ;
+			RAM[free_space - 1] = new_key;
+			RAM[free_space + 1] = prev;
 
 			printf("SUCCESS: element added\n");
 		}
@@ -86,11 +89,11 @@ void create_new_list()
 		scanf("%d", &new_key);
 		getchar();
 		existinglists.lists_head[existinglists.size - 1] = new_list;
-		RAMINT[free_space] = -1;
-		RAMINT[free_space - 1] = new_key;
-		RAMINT[free_space + 1] = -1;
+		RAM[free_space] = -1;
+		RAM[free_space - 1] = new_key;
+		RAM[free_space + 1] = -1;
 		// printf("list id: %d \n", new_list.id);
-		// printf("%d \t %d \t %d \n", RAMINT[free_space - 1], RAMINT[free_space], RAMINT[free_space + 1]);
+		// printf("%d \t %d \t %d \n", RAM[free_space - 1], RAM[free_space], RAM[free_space + 1]);
 		printf("SUCCESS\n");
 	}
 }
@@ -108,9 +111,9 @@ int get_tail_index()
 		return -1;
 	}
 
-	while(RAMINT[start] != -1)
+	while(RAM[start] != -1)
 	{
-		start = RAMINT[start];
+		start = RAM[start];
 	}
 
 	return start;
@@ -126,9 +129,9 @@ int get_second_last_index()
 		return -1;
 
 	int count = 0;
-		while((RAMINT[RAMINT[start]] != -1) && (count <= freelist.lists_head[0].size))
+		while((RAM[RAM[start]] != -1) && (count <= freelist.lists_head[0].size))
 		{
-			start = RAMINT[start];
+			start = RAM[start];
 			count ++;
 		}
 
@@ -145,17 +148,17 @@ int push_to_freelist(int index)
 		if (start == -1)
 		{
 			freelist.lists_head[0].head = index;
-			RAMINT[index - 1] = nullval;
-			RAMINT[index + 1] = nullval;
-			RAMINT[index] = -1;\
+			RAM[index - 1] = nullval;
+			RAM[index + 1] = nullval;
+			RAM[index] = -1;\
 			freelist.lists_head[0].size ++;
 			return 0;
 		}
 
-		RAMINT[start] = index;
-		RAMINT[index - 1] = nullval;
-		RAMINT[index + 1] = nullval;
-		RAMINT[index] = -1;
+		RAM[start] = index;
+		RAM[index - 1] = nullval;
+		RAM[index + 1] = nullval;
+		RAM[index] = -1;
 		freelist.lists_head[0].size ++;
 
 		return 0;
@@ -183,8 +186,8 @@ int pop_from_freelist()
 	{
 		int start = get_second_last_index();
 		printf("second last %d\n", start);
-		int free_space = RAMINT[start];
-		RAMINT[start] = -1;
+		int free_space = RAM[start];
+		RAM[start] = -1;
 		freelist.lists_head[0].size --;
 		printf("free space %d \n", free_space);
 
@@ -240,16 +243,16 @@ void delete_ele()
 		if (index == existinglists.lists_head[list_num - 1].head)
 		{
 			printf("inside if of del \n");
-			existinglists.lists_head[list_num - 1].head = RAMINT[index];
-			RAMINT[RAMINT[index] + 1] = -1;
+			existinglists.lists_head[list_num - 1].head = RAM[index];
+			RAM[RAM[index] + 1] = -1;
 			push_to_freelist(index);
 			return ;
 		}
 
 		printf("inside del index is %d:\n", index);
-		int prev = RAMINT[index + 1];
-		RAMINT[prev] = RAMINT[index];
-		RAMINT[RAMINT[index] + 1] = prev;
+		int prev = RAM[index + 1];
+		RAM[prev] = RAM[index];
+		RAM[RAM[index] + 1] = prev;
 		existinglists.lists_head[list_num - 1].size --;
 		push_to_freelist(index);
 		return ;
@@ -258,6 +261,9 @@ void delete_ele()
 }
 
 // display all lists --------------------------------------------
+
+
+
 void display_lists()
 {
 	printf("size: %d\n", existinglists.size);
@@ -273,14 +279,13 @@ void display_lists()
 		printf("Elements of list-%d are: \n", i);
 		printf("key \t next \t prev \n");
 
-
 		while(tmp != -1)
 		{
-			printf("%d \t ", *(RAMINT + tmp - 1));
-			printf("%d \t ", *(RAMINT + tmp));
-			printf("%d \n", *(RAMINT + tmp + 1));
-			 // printf("tmp in display lists : %d\n", tmp);
-			tmp = *(RAMINT + tmp);
+			int print_var;
+			printf("%d \t ", RAM[tmp - 1]);
+			print_var = RAM[tmp] != -1 ? printf("%d \t", RAM[tmp]) : printf("NIL \t");
+			print_var = RAM[tmp + 1] != -1 ? printf("%d \n", RAM[tmp + 1]) : printf("NIL \n");
+			tmp = *(RAM + tmp);
 		}
 	}
 }
@@ -291,8 +296,8 @@ void display_freelist()
 	printf("[");
 	while (index != -1)
 	{
-		printf("%d, ", index);
-		index = RAMINT[index];
+		printf("%d  ", index);
+		index = RAM[index];
 	}
 	printf("]\n");
 }
@@ -323,7 +328,6 @@ void count_ele_list()
 	int count = existinglists.lists_head[list_num - 1].size;
 	printf("Total number of nodes in list %d are %d.\n", list_num, count);
 }
-// --------------------------------------------------------------
 
 // searching ----------------------------------------------------
 int get_element_with_key(int list_num, int key)
@@ -332,15 +336,13 @@ int get_element_with_key(int list_num, int key)
 
 	int index = required_list.head;
 	printf("%d \n ", index);
-	//printf("inside get ele #\n");
 
 	while (index != -1)
 	{
-		 // printf("inside get ele ##\n");
-		if (RAMINT[index - 1] == key)
+		if (RAM[index - 1] == key)
 			return index;
-		//printf("%d \n ", index);
-		index = RAMINT[index];
+
+		index = RAM[index];
 	}
 
 	return -1;
