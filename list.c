@@ -31,6 +31,15 @@ void insert_new_ele()
 				return ;
 			}
 
+			if(existinglists.lists_head[list_num - 1].head == -5)
+			{
+				existinglists.lists_head[list_num - 1].head = free_space;
+				RAM[free_space - 1] = new_key;
+				RAM[free_space + 1] = -1;
+				printf("inside new state insert\n");
+				return ;
+			}
+
 			existinglists.lists_head[list_num - 1].size ++;
 			int current = existinglists.lists_head[list_num - 1].head;
 			int prev = RAM[current + 1];
@@ -140,17 +149,19 @@ int get_second_last_index()
 
 int push_to_freelist(int index)
 {
+	printf("INside push to freelist free head: %d\n", RAM[freelist.lists_head[0].head - 1]);
 	if(overflow_check())
 		return -1;
 	else
 	{
 		int start = get_tail_index();
+		printf("start val : %d \n", start);
 		if (start == -1)
 		{
 			freelist.lists_head[0].head = index;
 			RAM[index - 1] = nullval;
 			RAM[index + 1] = nullval;
-			RAM[index] = -1;\
+			RAM[index] = -1;
 			freelist.lists_head[0].size ++;
 			return 0;
 		}
@@ -231,31 +242,66 @@ void delete_ele()
 	printf("Enter the key value: ");
 	scanf("%d", &key);
 
+	if(list_num > existinglists.size)
+	{
+		printf("FAILURE: LIST DOES NOT EXIST\n");
+		return ;
+	}
+
 
 	if ((index = get_element_with_key(list_num, key)) == -1 || existinglists.lists_head[list_num - 1].size == 0)
 	{
 		printf("FAILURE: ELEMENT DOES NOT EXIST OR LIST IS EMPTY\n");
+		return ;
 	}
 
 	else
 	{	
-		// element at head of list
-		if (index == existinglists.lists_head[list_num - 1].head)
+		// element at head of list and single element
+		if (index == existinglists.lists_head[list_num - 1].head && existinglists.lists_head[list_num - 1].size == 1)
 		{
-			printf("inside if of del \n");
+			printf("inside if of del %d\n", index);
+			existinglists.lists_head[list_num - 1].head = -5;
+			existinglists.lists_head[list_num - 1].size = 0;
+			// RAM[RAM[index] + 1] = -1;
+			push_to_freelist(index);
+			return ;
+		}
+
+		//element at head
+		if (index == existinglists.lists_head[list_num - 1].head && existinglists.lists_head[list_num - 1].size > 1)
+		{
+			printf("inside if of del %d\n", index);
 			existinglists.lists_head[list_num - 1].head = RAM[index];
+			existinglists.lists_head[list_num - 1].size--;
 			RAM[RAM[index] + 1] = -1;
 			push_to_freelist(index);
 			return ;
 		}
 
-		printf("inside del index is %d:\n", index);
-		int prev = RAM[index + 1];
-		RAM[prev] = RAM[index];
-		RAM[RAM[index] + 1] = prev;
-		existinglists.lists_head[list_num - 1].size --;
-		push_to_freelist(index);
-		return ;
+
+		// element at end
+		else if (RAM[index] == -1)
+		{
+			printf("inside del index is %d:\n", index);
+			int prev = RAM[index + 1];
+			RAM[prev] = RAM[index];
+			// RAM[RAM[index] + 1] = prev;
+			existinglists.lists_head[list_num - 1].size  --;
+			push_to_freelist(index);
+			return ;
+		}
+
+		else
+		{
+			printf("inside del index is %d:\n", index);
+			int prev = RAM[index + 1];
+			RAM[prev] = RAM[index];
+			RAM[RAM[index] + 1] = prev;
+			existinglists.lists_head[list_num - 1].size  --;
+			push_to_freelist(index);
+			return ;
+		}
 	}
 
 }
@@ -279,7 +325,7 @@ void display_lists()
 		printf("Elements of list-%d are: \n", i);
 		printf("key \t next \t prev \n");
 
-		while(tmp != -1)
+		while(tmp != -1 && tmp != -5)
 		{
 			int print_var;
 			printf("%d \t ", RAM[tmp - 1]);
