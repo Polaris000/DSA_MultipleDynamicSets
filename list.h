@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define RAMSIZE 15
+#define RAMSIZE 999
 #define nullval -101
 
 //structs
