@@ -3,7 +3,6 @@
 #include "utils.h"
 
 
-
 void display_menu()
 {
 	printf("Select an option:  \n"
@@ -43,10 +42,11 @@ void swap(int i, int j, int list_num)
 		RAM[j - 1] = RAM[i - 1];
 		RAM[j] = next;
 		RAM[i - 1] = nullval;
+		RAM[i + 1] = nullval;
 	}
 
 	// filled node at end of list
-	if (next == -1)
+	else if (next == -1)
 	{
 		RAM[j] = next;
 		RAM[j + 1] = prev;
@@ -170,7 +170,7 @@ void select_pref_option()
 	int option = 0;
 	do
 	{
-		printf("Select an option between 0 and 8: ");
+		printf("Select an integer between 0 and 8: ");
 		scanf("%d", &option);
 		getchar();
 		printf(" \n");
