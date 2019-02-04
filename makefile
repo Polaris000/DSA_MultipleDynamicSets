@@ -2,5 +2,4 @@ run_code: utils.c list.c driver.c
 	gcc -c utils.c list.c
 	gcc -o run_code driver.c utils.o list.c 
 	./run_code
-	rm *.o
-	rm run_code
+	rm -f *.o run_code

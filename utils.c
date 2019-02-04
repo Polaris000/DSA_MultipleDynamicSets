@@ -3,6 +3,7 @@
 #include "utils.h"
 
 
+// display -----------------------------------------------------------
 void display_menu()
 {
 	printf("Select an option:  \n"
@@ -17,7 +18,7 @@ void display_menu()
 	"9. Press 0 to exit  \n");
 
 	printf(" ****************** \n");
-	disp_ram();
+	// disp_ram();
 }
 
 
@@ -30,11 +31,13 @@ void disp_ram()
 }
 
 
+// defragmentation ------------------------------------------------	
 void swap(int i, int j, int list_num)
 {
 	int next = RAM[i];
 	int prev = RAM[i + 1];
 
+	// filled node is only node in list
 	if (next == -1 && prev == -1)
 	{
 		existinglists.lists_head[list_num - 1].head = j;
@@ -97,12 +100,21 @@ void reset_order()
 	RAM[i] = -1;
 }
 
+
 int getlistnum(int i)
 {
-	for(int i = 1; i < existinglists.size; i++)
+	int prev = RAM[i + 1];
+
+	while(prev != -1)
 	{
-		if (existinglists.lists_head[i - 1].head == i)
-			return i;
+		prev = RAM[prev + 1];
+		i = RAM[i + 1];
+	}
+
+	for(int j = 1; j <= existinglists.size; j ++)
+	{
+		if(existinglists.lists_head[j - 1].head == i)
+			return j;
 	}
 }
 
@@ -151,20 +163,25 @@ void get_together()
 	get_together();
 }
 
+
 void perform_defragmentation()
 {
-	int index = 0;
-
-	if(freelist.lists_head[0].size == 0)
-		printf("Nothing free!\n");
+	if(freelist.lists_head[0].size == 0)	
+	{
+		printf("FAILURE: NOTHING IS FREE\n");
+		return ;
+	}
 
 	else
 	{
 		get_together();
 		reset_order();
 	}
+	printf("SUCCESS: RAM DEFRAGMENTED \n");
 }
+// ---------------------------------------------------------------
 
+// select option in menu -----------------------------------------
 void select_pref_option()
 {
 	int option = 0;
@@ -192,7 +209,7 @@ void select_pref_option()
 	printf(" \n"); printf(" \t ****************** \n"); printf(" \n");
 }
 
-
+// init ----------------------------------------------------------
 void init_freelist()
 {
 	freelist.lists_head = malloc(sizeof(List));
@@ -231,5 +248,6 @@ void init_all()
 	init_existinglists();
 	set_up_ram_int();
 }
-
+ 
+// ----------------------------------------------------------
 
