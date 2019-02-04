@@ -18,7 +18,6 @@ void display_menu()
 	"9. Press 0 to exit  \n");
 
 	printf(" ****************** \n");
-	// disp_ram();
 }
 
 
@@ -81,7 +80,6 @@ void swap(int i, int j, int list_num)
 void reset_order()
 {
 	freelist.lists_head[0].head = 1;
-	printf("size: %d\n", freelist.lists_head[0].size);
 	int count = 1;
 	int i = 1;
 	RAM[i] = -1;
@@ -89,7 +87,6 @@ void reset_order()
 	RAM[i + 1] = nullval;
 	while(count < freelist.lists_head[0].size)
 	{
-		printf(" in loop: i %d count %d\n", i, count);
 		RAM[i] = i + 3;
 		RAM[i - 1] = nullval;
 		RAM[i + 1] = nullval;
@@ -132,16 +129,7 @@ void get_together()
 	}
 
 	if (i == 3 * size + 1)
-	{
-		printf("INside if defrag\n");
 		return ;
-	}
-
-	else
-	{
-		printf("INside else defrag\n");
-	}
-
 
 	int j;
 	int list_num;
@@ -157,8 +145,6 @@ void get_together()
 	}
 
 	list_num = getlistnum(i);
-
-	printf("%d %d %d\n", i , j, list_num);
 	swap(i, j, list_num);
 	get_together();
 }
@@ -166,17 +152,8 @@ void get_together()
 
 void perform_defragmentation()
 {
-	if(freelist.lists_head[0].size == 0)	
-	{
-		printf("FAILURE: NOTHING IS FREE\n");
-		return ;
-	}
-
-	else
-	{
-		get_together();
-		reset_order();
-	}
+	get_together();
+	reset_order();
 	printf("SUCCESS: RAM DEFRAGMENTED \n");
 }
 // ---------------------------------------------------------------
@@ -187,7 +164,7 @@ void select_pref_option()
 	int option = 0;
 	do
 	{
-		printf("Select an integer between 0 and 8: ");
+		printf("Select an option between 0 and 8: ");
 		scanf("%d", &option);
 		getchar();
 		printf(" \n");

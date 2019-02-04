@@ -6,7 +6,6 @@
 // creating and inserting -----------------------------------------------
 void insert_new_ele()
 {
-	printf("inside ELSE for insert_new_ele #\n");
 	int list_num, new_key;
 	int free_space;
 
@@ -19,6 +18,11 @@ void insert_new_ele()
 	if (list_num > existinglists.size)
 		{
 			printf("FAILURE: LIST DOES NOT EXIST\n");
+			return ;
+		}
+	if (list_num < 1)
+		{
+			printf("FAILURE: ENTER LIST NUMBER GREATER THAN 0\n");
 			return ;
 		}
 
@@ -35,7 +39,6 @@ void insert_new_ele()
 				existinglists.lists_head[list_num - 1].head = free_space;
 				RAM[free_space - 1] = new_key;
 				RAM[free_space + 1] = -1;
-				printf("inside new state insert\n");
 				return ;
 			}
 
@@ -43,11 +46,8 @@ void insert_new_ele()
 			int current = existinglists.lists_head[list_num - 1].head;
 			int prev = RAM[current + 1];
 
-			printf("insert current and prev at start %d %d\n", current, prev);
-
 			if (new_key < RAM[current - 1])
 			{
-				printf("insert if new key < current #\n");
 				existinglists.lists_head[list_num - 1].head = free_space;
 				RAM[free_space - 1] = new_key;
 				RAM[free_space] = current;
@@ -58,12 +58,10 @@ void insert_new_ele()
 
 			while(current != -1 && RAM[current - 1] <= new_key)
 			{
-				printf("insert current and prev in loop %d %d\n", current, prev);
 				prev = current;
 				current = RAM[current];
 			}
 
-			printf("inside else for insert_new_ele ###\n");
 			RAM[prev] = free_space;
 			RAM[free_space] = current ;
 			RAM[free_space - 1] = new_key;
@@ -78,22 +76,16 @@ void create_new_list()
 {
 
 	if(underflow_check() == 1)
-	{
 		printf("FAILURE: MEMORY NOT AVAILABLE \n");
-		printf("INside if create_new_list\n");
-	}
-
+	
 	else
 	{
 		int free_space = pop_from_freelist();
-		printf("free_space:-> %d\n", free_space);
 		List new_list = existinglists.lists_head[existinglists.size - 1];
 		new_list.head = free_space;
-		//printf("free space: %d", free_space);
 		new_list.size = 1;
 		existinglists.size ++;
 		new_list.id = existinglists.size;
-		printf("list size: %d\n", existinglists.size);
 		printf("The sequence number of the newly created list is: %d \n", new_list.id);
 		printf("Enter key value to be inserted in the newly created list-%d: ", new_list.id);
 
@@ -104,8 +96,6 @@ void create_new_list()
 		RAM[free_space] = -1;
 		RAM[free_space - 1] = new_key;
 		RAM[free_space + 1] = -1;
-		// printf("list id: %d \n", new_list.id);
-		// printf("%d \t %d \t %d \n", RAM[free_space - 1], RAM[free_space], RAM[free_space + 1]);
 		printf("SUCCESS: NEW LIST CREATED\n");
 	}
 }
@@ -119,9 +109,7 @@ int get_tail_index()
 	int start = freelist.lists_head[0].head;
 
 	if (freelist.lists_head[0].size == 0)
-	{
 		return -1;
-	}
 
 	while(RAM[start] != -1)
 	{
@@ -133,9 +121,7 @@ int get_tail_index()
 
 int get_second_last_index()
 {
-	printf("inside second last index\n");
 	int start = freelist.lists_head[0].head;
-	printf("start %d \n", start);
 
 	if (freelist.lists_head[0].size < 2)
 		return -1;
@@ -152,13 +138,11 @@ int get_second_last_index()
 
 int push_to_freelist(int index)
 {
-	printf("INside push to freelist free head: %d\n", RAM[freelist.lists_head[0].head - 1]);
 	if(overflow_check())
 		return -1;
 	else
 	{
 		int start = get_tail_index();
-		printf("start val : %d \n", start);
 		if (start == -1)
 		{
 			freelist.lists_head[0].head = index;
@@ -182,7 +166,6 @@ int push_to_freelist(int index)
 int pop_from_freelist()
 {
 
-	printf("INside pop from freelist\n");
 	int underflow_return = underflow_check();
 
 	if(underflow_return == 1)
@@ -199,19 +182,16 @@ int pop_from_freelist()
 	else
 	{
 		int start = get_second_last_index();
-		printf("second last %d\n", start);
 		int free_space = RAM[start];
 		RAM[start] = -1;
 		freelist.lists_head[0].size --;
-		printf("free space %d \n", free_space);
-
 		return free_space;
 	}
 }
 
+
 int overflow_check()
 {
-	printf("freelist size: %d RAMSIZE: %d\n", freelist.lists_head[0].size, RAMSIZE);
 	if (freelist.lists_head[0].size == RAMSIZE / 3)
 		return 1;
 	else
@@ -238,8 +218,6 @@ int underflow_check()
 void delete_ele()
 {
 	int index, list_num, key;
-	printf("inside del\n");
-
 	printf("List you want to delete from: ");
 	scanf("%d", &list_num);
 	getchar();
@@ -264,10 +242,8 @@ void delete_ele()
 		// element at head of list and single element
 		if (index == existinglists.lists_head[list_num - 1].head && existinglists.lists_head[list_num - 1].size == 1)
 		{
-			printf("inside if of del %d\n", index);
 			existinglists.lists_head[list_num - 1].head = -5;
 			existinglists.lists_head[list_num - 1].size = 0;
-			// RAM[RAM[index] + 1] = -1;
 			push_to_freelist(index);
 			printf("SUCCESS: ELEMENT DELETED\n");
 			return ;
@@ -276,7 +252,6 @@ void delete_ele()
 		//element at head
 		if (index == existinglists.lists_head[list_num - 1].head && existinglists.lists_head[list_num - 1].size > 1)
 		{
-			printf("inside if of del %d\n", index);
 			existinglists.lists_head[list_num - 1].head = RAM[index];
 			existinglists.lists_head[list_num - 1].size--;
 			RAM[RAM[index] + 1] = -1;
@@ -288,10 +263,8 @@ void delete_ele()
 		// element at end
 		else if (RAM[index] == -1)
 		{
-			printf("inside del index is %d:\n", index);
 			int prev = RAM[index + 1];
 			RAM[prev] = RAM[index];
-			// RAM[RAM[index] + 1] = prev;
 			existinglists.lists_head[list_num - 1].size  --;
 			push_to_freelist(index);
 			printf("SUCCESS: ELEMENT DELETED\n");
@@ -300,7 +273,6 @@ void delete_ele()
 
 		else
 		{
-			printf("inside del index is %d:\n", index);
 			int prev = RAM[index + 1];
 			RAM[prev] = RAM[index];
 			RAM[RAM[index] + 1] = prev;
@@ -317,7 +289,6 @@ void delete_ele()
 
 void display_lists()
 {
-	printf("size: %d\n", existinglists.size);
 	if(existinglists.size == 0)
 	{
 		printf("FAILURE: THERE ARE NO LISTS\n");
@@ -392,8 +363,6 @@ int get_element_with_key(int list_num, int key)
 	List required_list = existinglists.lists_head[list_num - 1];
 
 	int index = required_list.head;
-	printf("%d \n ", index);
-
 	while (index != -1 && index != -5)
 	{
 		if (RAM[index - 1] == key)
