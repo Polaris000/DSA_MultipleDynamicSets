@@ -18,13 +18,14 @@ void display_menu()
 	"9. Press 0 to exit  \n");
 
 	printf(" ****************** \n");
-	 // disp_ram();
+	disp_ram();
 }
+
 
 void disp_ram()
 {
 	for (int i = 1; i <= RAMSIZE; i ++)
-		printf("%d (%d) |", RAMINT[i - 1], i);
+		printf("%d (%d) |", RAM[i - 1], i);
 
 	printf(" \t ***\n");
 }
@@ -32,50 +33,47 @@ void disp_ram()
 
 void swap(int i, int j, int list_num)
 {
-	int next = RAMINT[i];
-	int prev = RAMINT[i + 1];
+	int next = RAM[i];
+	int prev = RAM[i + 1];
 
 	if (next == -1 && prev == -1)
 	{
 		existinglists.lists_head[list_num - 1].head = j;
-		RAMINT[j + 1] = prev;
-		RAMINT[j - 1] = RAMINT[i - 1];
-		RAMINT[j] = next;
-		RAMINT[i - 1] = nullval;
+		RAM[j + 1] = prev;
+		RAM[j - 1] = RAM[i - 1];
+		RAM[j] = next;
+		RAM[i - 1] = nullval;
 	}
 
 	// filled node at end of list
 	if (next == -1)
 	{
-		RAMINT[j] = next;
-		RAMINT[j + 1] = prev;
-		RAMINT[j - 1] = RAMINT[i - 1];
-		RAMINT[RAMINT[j + 1]] = j;
+		RAM[j] = next;
+		RAM[j + 1] = prev;
+		RAM[j - 1] = RAM[i - 1];
+		RAM[RAM[j + 1]] = j;
 
-		RAMINT[i - 1] = nullval; 
+		RAM[i - 1] = nullval; 
 	}
 
 	// filled node at head of list
 	else if(prev == -1)
 	{
 		existinglists.lists_head[list_num].head = j;
-		RAMINT[j + 1] = prev;
-		RAMINT[j - 1] = RAMINT[i - 1];
-		RAMINT[RAMINT[next] + 1] = j;
-		RAMINT[i - 1] = nullval;
+		RAM[j + 1] = prev;
+		RAM[j - 1] = RAM[i - 1];
+		RAM[RAM[next] + 1] = j;
+		RAM[i - 1] = nullval;
 	}
-
 
 	// in the middle
 	else
 	{
-		RAMINT[RAMINT[i + 1]] = j;
-		RAMINT[RAMINT[next] + 1] = j;
-		RAMINT[i - 1] = nullval;
+		RAM[RAM[i + 1]] = j;
+		RAM[RAM[next] + 1] = j;
+		RAM[i - 1] = nullval;
 	}
-
 }
-
 
 void reset_order()
 {
@@ -83,22 +81,20 @@ void reset_order()
 	printf("size: %d\n", freelist.lists_head[0].size);
 	int count = 1;
 	int i = 1;
-	RAMINT[i] = -1;
-	RAMINT[i - 1] = nullval;
-	RAMINT[i + 1] = nullval;
+	RAM[i] = -1;
+	RAM[i - 1] = nullval;
+	RAM[i + 1] = nullval;
 	while(count < freelist.lists_head[0].size)
 	{
 		printf(" in loop: i %d count %d\n", i, count);
-		RAMINT[i] = i + 3;
-		RAMINT[i - 1] = nullval;
-		RAMINT[i + 1] = nullval;
+		RAM[i] = i + 3;
+		RAM[i - 1] = nullval;
+		RAM[i + 1] = nullval;
 		i += 3;
 		count ++;
 	}
 
-	RAMINT[i] = -1;
-
-
+	RAM[i] = -1;
 }
 
 int getlistnum(int i)
@@ -110,13 +106,37 @@ int getlistnum(int i)
 	}
 }
 
-void get_together(int i)
+void get_together()
 {
+
+	int index = freelist.lists_head[0].head;	
+	int size = freelist.lists_head[0].size;
+	int i;
+
+	for (i = 1; i <= RAMSIZE; i += 3)
+	{
+		if (RAM[i - 1] != nullval)
+			break;
+	}
+
+	if (i == 3 * size + 1)
+	{
+		printf("INside if defrag\n");
+		return ;
+	}
+
+	else
+	{
+		printf("INside else defrag\n");
+	}
+
+
 	int j;
 	int list_num;
+
 	for(j = RAMSIZE - 2; j >= 1; j -= 3)
 	{
-		if(RAMINT[j - 1] == nullval)
+		if(RAM[j - 1] == nullval)
 			break;
 	}
 	if (j <= i)
@@ -128,11 +148,8 @@ void get_together(int i)
 
 	printf("%d %d %d\n", i , j, list_num);
 	swap(i, j, list_num);
-	reset_order();
+	get_together();
 }
-
-
-
 
 void perform_defragmentation()
 {
@@ -143,43 +160,20 @@ void perform_defragmentation()
 
 	else
 	{
-		int index = freelist.lists_head[0].head;	
-		int size = freelist.lists_head[0].size;
-		int i;
-
-		for (i = 1; i <= RAMSIZE; i += 3)
-		{
-			if (RAMINT[i - 1] != nullval)
-				break;
-		}
-
-		if (i == 3 * size + 1)
-		{
-			printf("INside if defrag\n");
-			reset_order();
-		}
-
-		else
-		{
-			printf("INside else defrag\n");
-			get_together(i);
-		}
-
+		get_together();
+		reset_order();
 	}
-
-
 }
 
 void select_pref_option()
 {
-	
-	int option;
-
+	int option = 0;
 	do
 	{
 		printf("Select an option between 0 and 8: ");
 		scanf("%d", &option);
 		getchar();
+		printf(" \n");
 	} while (option < 0 || option > 8);
 
 	switch(option)
@@ -195,8 +189,7 @@ void select_pref_option()
 		case 0: exit(0); 					break; //done
 	}
 
-	printf(" ****************** \n");
-
+	printf(" \n"); printf(" \t ****************** \n"); printf(" \n");
 }
 
 
@@ -218,12 +211,12 @@ void init_existinglists()
 
 void fill_contig_loc(int i)
 {
-	RAMINT[i - 1] = nullval;
+	RAM[i - 1] = nullval;
 	if (i == RAMSIZE - 2)
-		RAMINT[i] = -1;
+		RAM[i] = -1;
 	else
-		RAMINT[i] = i + 3;
-	RAMINT[i + 1] = nullval;
+		RAM[i] = i + 3;
+	RAM[i + 1] = nullval;
 }
 
 void set_up_ram_int()
@@ -239,39 +232,4 @@ void init_all()
 	set_up_ram_int();
 }
 
-
-// void main()
-// {
-// 	init_all();
-// 	create_new_list(2);
-// 	insert_new_ele(1, 3);
-// 	display_freelist();
-// 	// display_lists();
-// 	disp_ram();
-// 	insert_new_ele(1, 4);
-// 	display_freelist();
-// 	// display_lists();
-// 	disp_ram();
-// 	insert_new_ele(1, 5);
-// 	display_freelist();
-// 	disp_ram();
-// 	insert_new_ele(1, 7);
-// 	display_freelist();
-// 	display_lists();
-// 	disp_ram();
-
-// 	delete_ele(1, 5);
-// 	display_freelist();
-// 	display_lists();
-// 	disp_ram();
-
-// 	perform_defragmentation();
-// 	disp_ram();
-// 	display_freelist();
-// 	display_lists();
-// 	printf("%d", count_total_ele());
-// 	printf("%d", count_ele_list(1));
-
-
-// }
 

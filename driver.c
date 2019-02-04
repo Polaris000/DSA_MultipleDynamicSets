@@ -3,7 +3,6 @@
 #include "utils.h"
 
 
-
 int main()
 {
 	init_all();
@@ -15,5 +14,3 @@ int main()
 
 	return 0;
 }
-
-

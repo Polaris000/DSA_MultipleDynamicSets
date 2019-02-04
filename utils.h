@@ -8,7 +8,7 @@ void display_menu();
 void disp_ram();
 void swap(int i, int j, int list_num);
 void reset_order();
-void get_together(int i);
+void get_together();
 void perform_defragmentation();
 void select_pref_option();
 void init_freelist();

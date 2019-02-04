@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define RAMSIZE 600
+#define RAMSIZE 15
 #define nullval -101
 
 //structs
@@ -19,7 +19,7 @@ typedef struct ListofLists_
 
 
 // global variables
-int RAMINT[RAMSIZE];
+int RAM[RAMSIZE];
 ListofLists existinglists;
 ListofLists freelist;
 
