@@ -4,7 +4,10 @@ As part of our Data Structures and Algorithms course at BITS Pilani, Pilani camp
 
 Put simply, the project entailed using dynamic arrays with the funtionality of doubly linked lists. Though computer memory can have heterogenous objects, the project assumes homogenous objects.
 
+![](/images/abstract.png)
+
 Each object had three attributes: a key, a pointer to the next object in the list and one to the previous object.
+
 
 ```
 object
@@ -17,6 +20,8 @@ object
 Since each object has three attributes, which are in essence, integers, storing `n` logical objects would require a space of `3 * n`.
 
 At a given point of time, our RAM with a capacity of, say, `m` objects, would be partially populated. The remaining space of `m - n` objects would be considered as free.
+
+![](/images/memory.png)
 
 Free objects would be maintained as another doubly linked list, but their `prev` fields would be `NULL`. The allocating and freeing of objects from RAM would follow the properties of a stack -- the next object allocated would be the last one freed.
 
