@@ -2,7 +2,7 @@
 
 As part of our Data Structures and Algorithms course at BITS Pilani, Pilani campus, we were asked to implement a simple abstraction of a computer's RAM using multiple dynamic sets.
 
-Put simply, the project entailed using dynamic arrays with the funtionality of doubly linked lists. Though computer memory can have heterogenous objects, the project assumes homogenous objects.
+Put simply, the project entailed using dynamic arrays with the functionality of doubly linked lists. Though computer memory can have heterogeneous objects, the project assumes homogeneous objects.
 
 ![](/images/abstract.png)
 
